@@ -4,6 +4,12 @@ Remote File/Directory Fuzzer, Lan Host Enumerator, Port/Vulnerability Scanner
 Currently in Alpha
 Current version = v0.3
 
+This is a new project - there are still some bugs that need to be dealt with.
+Please report any issues.
+
+I'll be updating this frequently as I add functionality and fix bugs.
+
+
 Setup-----------------------------------------
 deep is written for python 2.7 (python 3 will not work)
 
@@ -46,11 +52,11 @@ filetype <extension> (only look for files with the given extension)
 -w <option>/-w <wordlist>  -- set the wordlist to use.
 
   available options are:
-    common           (common directory names)
-    all              (all directory names in default wordlist)
-    +/plus/more  (a more intensive directory search than common)
-    ++ / -crazy      (a more intensive directory search than -plus)
-    <wordlist>        (enter the path to your own wordlist)
+     common           (common directory names)
+     all              (all directory names in default wordlist)
+     +/plus/more  (a more intensive directory search than common)
+     ++ / -crazy      (a more intensive directory search than -plus)
+     <wordlist>        (enter the path to your own wordlist)
 
 -wf <option>/ -wf <wordlist>  -- search for filenames instead of directories.
   Same options as -w
