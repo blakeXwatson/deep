@@ -1,66 +1,43 @@
-# deep
-Remote File/Directory Fuzzer, Lan Host Enumerator, Port/Vulnerability Scanner
+Updated recently.
+Better, faster, etc...
 
-Currently in Alpha
-Current version = v0.3
+usage: deep <args> target (ip or domain name)
+    args:
+    -t  <seconds>        
+        time between requests
 
-This is a new project - there are still some bugs that need to be dealt with.
-Please report any issues.
+    --dir <options/filename> 
+        scan for directories
+        options: common, extra, crazy, all
 
-I'll be updating this frequently as I add functionality and fix bugs.
+    --file <options/filename>
+        scan for files
+        options: common, extra, crazy, all
 
+    -p <port>
+        set the port to connect on 
 
-Setup-----------------------------------------
-deep is written for python 2.7 (python 3 will not work)
+    -f <code1,code2,etc...>
+        only display pages with a particular response code/codes
+        ex.  "deep -f 200,401,402 test.com" only displays pages that responded with 200,401, or 404 
 
-repositories in use:
-  threading
-  time
-  requests
-  sys
-  os
-  subprocess
-  
- All of these should be installed by default.  If, for whatever reason, a package cannot be found, use pip install to download and install it.
- 
- deep requires numerous wordlists, stored in an adjacent folder called wordlist, in order to function.
- These wordlists are included on the github page in the folder "wordlist"
- 
- ---------------------------------------------------------------------------------------
- 
- Functions:
-   deep is currently able to fuzz remote http server in order to reveal directories and files, and filter output by response code and filetype.
-   
--n <name>  -- domain name of target "xxxx.xxx"
+    -rm <code1,code2,etc...>
+        display pages that responded with anything but a particular code/codes
+        ex.  "deep -rm 400 test.com" displays every page that doesn't respond with code 400
 
--?/-help/--help  -- print commands
+    --threads <number of threads>
+        specify the number of threads to use.  default is 10
+        going too high with this might DoS the target
+        
+    --timeout <seconds>
+        specify how long to wait for a page to respond
 
--f  Ok/N/F/Bad/R/Un  -- filter output by response type.
-  available options are:
+    --tries <number of attempts>
+        specify the number of times to try requesting a page before giving up.
 
-    Ok -  code 200
-    N -   code 404 (not found)
-    F -   code 403 (forbidden)
-    Bad - code 400 (bad request)
-    R -   redirect
-    Un -  code 401 (unauthorized)
+    --useragent <user-agent string>
+        specify a user-agent string to use for requests
+        default is Chrome
 
-filetype <extension> (only look for files with the given extension)
-
--t <time(seconds)>  -- set wait time between requests
-
--w <option>/-w <wordlist>  -- set the wordlist to use.
-
-  available options are:
-     common           (common directory names)
-     all              (all directory names in default wordlist)
-     +/plus/more  (a more intensive directory search than common)
-     ++ / -crazy      (a more intensive directory search than -plus)
-     <wordlist>        (enter the path to your own wordlist)
-
--wf <option>/ -wf <wordlist>  -- search for filenames instead of directories.
-  Same options as -w
-  
-  
-
-
+    --help/-h
+        display usage page.
