@@ -2,7 +2,7 @@ Updated recently.
 Better, faster, etc...
 
 usage: deep <args> target (ip or domain name)
-    args:
+    
     -t  <seconds>        
         time between requests
 
