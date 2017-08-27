@@ -104,47 +104,46 @@ def poke(url):
 
 
     #lock('a')
-    for each in range(0, 3):  #attempt 3 times, then ignore:
-      try:
+
+    try:
       
-        r=requests.get(url, timeout=5)      
-        r.close()
-        r=str(r)
-        code=r.split("[")[1].split("]")[0]
-        code=int(code)
-        response = errorlist[code]
-      except KeyError:
-        response = "code not found : "+str(code)
-      #'''
-      #except requests.exceptions.ConnectionError:
-      #  if retries<2:
-      #    print "Connection Error.\nRetrying in one second."
-      #    #PAUSE=True
-      #    #time.sleep(1)
-      #    countdown(3)
-      #    retries = retries + 1
-      #    poke(url)  #no clue what this'll do
-      #  else:
-      #    print "Connection Failed.  Quitting..."
-      #    retries=-1
-      #    PAUSE=False
-      #    t = Thread(target=kill, args=()) #should help kill the program if something goes wrong
-      #    t.start()
-      #'''  
+      r=requests.get(url, timeout=5)      
+      r.close()
+      r=str(r)
+      code=r.split("[")[1].split("]")[0]
+      code=int(code)
+      response = errorlist[code]
+    except KeyError:
+      response = "code not found : "+str(code)
+    except requests.exceptions.ConnectionError:
+      if retries<2:
+        print "Connection Error.\nRetrying in one second."
+        #PAUSE=True
+        #time.sleep(1)
+        countdown(3)
+        retries = retries + 1
+        poke(url)  #no clue what this'll do
+      else:
+        print "Connection Failed.  Quitting..."
+        retries=-1
+        PAUSE=False
+        t = Thread(target=kill, args=()) #should help kill the program if something goes wrong
+        t.start()
+      
       
         
-      except:  #this just looked kinda off.  we'll see what happens
-        lines.append(url[:-1].split("/")[-1])
-        response = "ERROR"
+    except:  #this just looked kinda off.  we'll see what happens
+      lines.append(url[:-1].split("/")[-1])
+      response = "ERROR"
     
-      if quit==True:#
-        sys.exit()#
-      output.append([response, url])
+    if quit==True:#
+      sys.exit()#
+    output.append([response, url])
     
-      #t=Thread(target=show_progress, args=(url,))
-      #t.start#show(response, url)  #this condition seems to be causing problems way downstream.  be cautious
-      
-      show(response, url)
+    #t=Thread(target=show_progress, args=(url,))
+    #t.start#show(response, url)  #this condition seems to be causing problems way downstream.  be cautious
+    
+    show(response, url)
 
 def print_help():
   print('\n-n <name>  -- domain name of target \"xxxx.xxx\"\n')
