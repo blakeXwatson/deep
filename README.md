@@ -1,3 +1,6 @@
+#  Note for users:
+#    I hardcoded a path in the code.  Until I have some time to fix that up please change it in the source to match your environment.
+
 Updated recently.
 Better, faster, etc...
 
