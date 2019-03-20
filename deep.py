@@ -1,16 +1,8 @@
-import getch
-#turns off insecure platform warning from requests.  
-import requests.packages.urllib3
-requests.packages.urllib3.disable_warnings()
-
-import requests
-import threading
+import requests,threading,time,sys,os,traceback, requests.packages.urllib3
 from threading import Thread
-import time
-import os
 from subprocess import check_output
-import sys,os
-import traceback
+
+requests.packages.urllib3.disable_warnings()  #turns off insecure platform warning from requests.  
 
 
 class Deep:
@@ -48,7 +40,7 @@ class Deep:
     self.scanned_count = 0
     self.start()
 
-
+    
   def print_progress(self):      #might implement with an nmap style keypress to get current progress.
    sys.stdout.write(str(self.scanned_count) + ' scanned.  ' + str((self.scanned_count+.0)/self.list_length)+'% finished.')
 
