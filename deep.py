@@ -1,19 +1,12 @@
-<<<<<<< HEAD
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
 from time import sleep
-import time
 import requests
 import threading
 from threading import Thread
 import multiprocessing
 from multiprocessing import Process, Queue
-import time
-import os
-=======
 import requests,threading,time,sys,os,traceback, requests.packages.urllib3
-from threading import Thread
->>>>>>> 53987073d8d33448cd94bd6f021acec5e6b06995
 from subprocess import check_output
 
 requests.packages.urllib3.disable_warnings()  #turns off insecure platform warning from requests.  
@@ -59,11 +52,7 @@ class Deep:
     self.printing=False #True
     self.listening=False
     self.failed=[]    #failed urls
-<<<<<<< HEAD
     self.path=os.path.dirname(os.path.realpath(__file__))+'/'  #'/home/ball-tongue/deep/'
-=======
-    self.path=os.path.dirname(os.path.realpath(__file__))+'/'
->>>>>>> 53987073d8d33448cd94bd6f021acec5e6b06995
     self.args=args
     self.target=''
     self.running=True
