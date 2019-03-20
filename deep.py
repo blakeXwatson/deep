@@ -9,7 +9,7 @@ from threading import Thread
 import time
 import os
 from subprocess import check_output
-import sys
+import sys,os
 import traceback
 
 
@@ -21,7 +21,7 @@ class Deep:
 
     self.listening=False
     self.failed=[]    #failed urls
-    self.path='/home/ball-tongue/deep/'
+    self.path=os.path.dirname(os.path.realpath(__file__))+'/'
     self.args=args
     self.target=''
     self.switches={}
