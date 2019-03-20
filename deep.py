@@ -1,21 +1,72 @@
+<<<<<<< HEAD
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
+from time import sleep
+import time
+import requests
+import threading
+from threading import Thread
+import multiprocessing
+from multiprocessing import Process, Queue
+import time
+import os
+=======
 import requests,threading,time,sys,os,traceback, requests.packages.urllib3
 from threading import Thread
+>>>>>>> 53987073d8d33448cd94bd6f021acec5e6b06995
 from subprocess import check_output
 
 requests.packages.urllib3.disable_warnings()  #turns off insecure platform warning from requests.  
 
+
+def print_thread(queue,running): #self):
+  while running:
+    if queue.empty():continue
+    print queue.get()[0]
+
+def check_page(url,scanned_count, switches, passes_filters, show, failed, running):
+  try:
+    scanned_count = scanned_count+1
+    for each in range(0,switches['--tries']):
+      try:  #leave the loop as soon as you get a response
+        r=requests.get(url, timeout=switches['--timeout'])
+        code=str(r.status_code)
+        if passes_filters(code):
+          show(url, code, r)
+        break
+      except Exception as e:
+        failed.append(url)
+
+    time.sleep(switches['-t'])  #
+  except KeyboardInterrupt:
+    print 'quitting'
+    running=False
+    exit()
+  except Exception as e:
+    print e
 
 class Deep:
   def __init__(self, args=[]):
     if len(args)<1:
       self.print_help()
       exit()
-
+    self.verbose=False
+    if '-v' in args:
+      args.remove('-v')
+      self.verbose=True
+    self.queue=Queue()
+    self.running_queue=Queue()
+    self.printing=False #True
     self.listening=False
     self.failed=[]    #failed urls
+<<<<<<< HEAD
+    self.path=os.path.dirname(os.path.realpath(__file__))+'/'  #'/home/ball-tongue/deep/'
+=======
     self.path=os.path.dirname(os.path.realpath(__file__))+'/'
+>>>>>>> 53987073d8d33448cd94bd6f021acec5e6b06995
     self.args=args
     self.target=''
+    self.running=True
     self.switches={}
     self.switches['-t'] = 0
     self.switches['--dir'] = 'None'
@@ -29,47 +80,64 @@ class Deep:
     self.switches['--useragent'] = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'    #recent chrome.
     self.switches['--protocol'] = 'http'
     self.parse_args()
-    self.convert_args()            
+    #self.verbose=False
+    #if '-v' in self.args:
+    #  self.verbose=True
+    #  self.args.pop(self.args.index('-v'))
+    self.convert_args()
+
     self.check_scan_type()  #cleans up -w & -wf arg logic.
     if self.target=='':
       print 'you must provide a target ip or url'
       print 'use --help to see usage'
       exit()
+    print self.target
     self.load_file()
     self.set_filters()
     self.scanned_count = 0
-    self.start()
 
     
   def print_progress(self):      #might implement with an nmap style keypress to get current progress.
-   sys.stdout.write(str(self.scanned_count) + ' scanned.  ' + str((self.scanned_count+.0)/self.list_length)+'% finished.')
+    sys.stdout.write(str(self.scanned_count) + ' scanned.  ' + str((self.scanned_count+.0)/self.list_length)+'% finished.')
 
   
   def show(self, url, code, req):
-    url=url.split(':'+self.switches['-p'])[1]
-    padding=20-len(url)
-    spaces=' '*padding
-    meaning=''
-    if code in self.filters:
-      meaning=self.filters[code]
-    msg=url+spaces+code.strip()+'   ' + meaning.strip()
-    sys.stdout.write(msg+'\n')  #note to self: stdout.write avoids the spacing issues that usually pop up when threading
+    try:
+      url=''.join(url.split(':'+self.switches['-p']))
+      while '/~' in url: url=url.replace('/~', '/')
+      meaning=''
+      if code in self.filters: meaning=str(self.filters[code]).strip()
+      #print url
+      #self.msgs.append(url+'     '+code+'  '+meaning)
+      msg=url+'     '
+      if len(msg)<50:msg=msg+' '*(50-len(msg))
+      self.queue.put([msg+'     '+code+'  '+meaning])
+    except StandardError as e:
+      print 'Exception caught in deep.show\n' + str(e) + '\n'
 
 
   def check_page(self, url):
-    self.scanned_count = self.scanned_count+1
-    for each in range(0,self.switches['--tries']):
-      try:  #leave the loop as soon as you get a response
-        r=requests.get(url, timeout=self.switches['--timeout'])
-        code=str(r.status_code)
-        if self.passes_filters(code):
-          #could pass r elsewhere and do a regex check or something as well
-          self.show(url, code, r)
-        break
-      except:
-        self.failed.append(url)
+    try:
+      self.scanned_count = self.scanned_count+1
+      for each in range(0,self.switches['--tries']):
+        try:  #leave the loop as soon as you get a response
+          r=requests.get(url, timeout=self.switches['--timeout'])
+          code=str(r.status_code)
+          if self.passes_filters(code):
+            #could pass r elsewhere and do a regex check or something as well
+            self.show(url, code, r)
+          break
+        except Exception as e:
+          #print e
+          self.failed.append(url)
 
-    time.sleep(self.switches['-t'])  #
+      time.sleep(self.switches['-t'])  #
+    except KeyboardInterrupt:
+      print 'quitting'
+      self.running=False
+      exit()
+    except Exception as e:
+      print e
 
   
   def passes_filters(self, code):
@@ -92,7 +160,6 @@ class Deep:
     print 'idk what happened here.'
     return True  #?
 
-
   def start(self):
     self.target.replace('www.', '')
     #cut proto out of target url
@@ -102,13 +169,34 @@ class Deep:
     self.target=self.switches['--protocol']+'://'+self.target
     self.target=self.target+':'+self.switches['-p']
     headers={'User-Agent':self.switches['--useragent']}
+    count=0
+    p_proc = Process(target=print_thread,args=(self.queue,self.running_queue,))
+    p_proc.start()
+    while len(self.wordlist)>0 and self.running:
+      try:
+        target_url=self.target+'/'+self.wordlist[0] #these two lines pop the next target file/dir into target_url
+        self.wordlist.remove(self.wordlist[0])
+        try:
+          while threading.active_count()>self.switches['--threads']: #don't exceed max threads
+            time.sleep(0.05)      #not sure what would be best here, honestly
+        except KeyboardInterrupt:
+          self.running=False
+          self.wordlist=[]
+          print 'quitting'
+          exit(0)
+        Thread(target=self.check_page, args=(target_url,)).start() #scan page
+        count+=1
+      except Exception as e:
+        if 'keyboard interrupt' not in str(e).lower():
+          print 'int start()  ' + str(e) + '\n'
+        else:
+          #print 'in start():     ' + str(e)+'\n'
+          self.running=False
+          break
+      if count%25==0 and self.verbose: print 'scanned: ' + str(count) + ' pages\n'
+    self.running=False
+    exit()
 
-    while len(self.wordlist)>0:
-      target_url=self.target+'/'+self.wordlist[0] #these two lines pop the next target file/dir into target_url
-      self.wordlist.remove(self.wordlist[0])
-      while threading.active_count()>self.switches['--threads']: #don't exceed max threads
-        time.sleep(0.05)      #not sure what would be best here, honestly
-      Thread(target=self.check_page, args=(target_url,)).start() #scan page
 
 
   def set_filters(self):
@@ -183,7 +271,10 @@ class Deep:
         self.word_file=self.switches['--file']
     
     if not self.test_file(self.word_file):
+      while self.printing: time.sleep(0.01)
+      self.printing=True
       print 'file not found: ' + self.word_file
+      self.printing=False
       exit()
 
 
@@ -266,9 +357,15 @@ class Deep:
 #if len(sys.argv)<2:
   
 #  exit()
-
-deep = Deep(sys.argv[1:])
-
+if __name__ == '__main__':
+  try:
+    deep = Deep(sys.argv[1:])
+    deep.start()
+  except Exception as e:
+    deep.running=False
+    print str(e)[:50]+'\n'
+    print 'quitting'
+    exit()
 
 
 
